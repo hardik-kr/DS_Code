@@ -170,7 +170,7 @@ void bst::postorder(node *temp)
 int bst::height()
 {
 	node *temp=root ;
-	height(temp);
+	return height(temp);
 }
 int bst::height(node *temp)
 {

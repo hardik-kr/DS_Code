@@ -75,6 +75,8 @@ class AVL
 	void postorder(node *);
     int bal_fact(node *);
     node *delnode(node *,int);
+    node *RightRT(node *) ;
+    node *LeftRT(node *);
 
     public :
     AVL()
@@ -84,10 +86,23 @@ class AVL
     void addnode(int);
     //bool search(int);
     //void delnode(int);
-    //int height();   
+    int height();   
     void order(int);
 
 };
+int AVL::height()
+{
+    return height(root);
+}
+int AVL::height(node *temp)
+{
+	if(temp==NULL) return 0 ;
+    else
+    {
+        return temp->getheight() ;
+    }
+    
+}
 
 void AVL::addnode(int data)
 {
@@ -112,10 +127,83 @@ node *AVL::addnode(node *temp,int data)
         {
             temp->setlchild(addnode(temp->getlchild(),data));
         }
+        else
+        {
+            cout<<"Already Present" ;
+        }
+        temp->setheight(max(height(temp->getlchild()),height(temp->getrchild())) + 1);
+        int bal = bal_fact(temp) ;
+        
+        if(bal>1 && data < (temp->getlchild())->getdata())                 //LL problem
+        {
+            cout<<"\nLL problem";
+            return RightRT(temp) ;
+        }
+        else if(bal<-1 && data > (temp->getrchild())->getdata())            //RR problem
+        {
+            cout<<"RR problem" ;
+            return LeftRT(temp) ;
+        }
+        else if(bal>1 && data > (temp->getlchild())->getdata())            //LR problem
+        {
+            cout<<"LR problem" ;
+            temp->setlchild(LeftRT(temp->getlchild())) ;
+            return RightRT(temp) ;           
+        }
+        else if(bal<-1 && data < (temp->getrchild())->getdata())             //RL problem
+        {
+            cout<<"RL problem" ;
+            temp->setrchild(RightRT(temp->getrchild())) ;
+            return LeftRT(temp) ;
+        }
         
     }
+    return temp ;
     
 }
+
+node *AVL::RightRT(node *temp)
+{
+    node *temp_left = temp->getlchild() ;
+    node *temp_left_rightsubtree=temp_left->getrchild() ;
+
+    temp_left->setrchild(temp) ;                                //Actual_rotation
+    temp->setlchild(temp_left_rightsubtree) ;
+
+    temp->setheight( max(height(temp->getlchild()),height(temp->getrchild())) + 1 ) ;            //updation of height 
+    temp_left->setheight( max(height(temp_left->getlchild()),height(temp_left->getrchild())) + 1 );
+
+    return temp_left ;
+
+}
+node *AVL::LeftRT(node *temp)
+{
+    node *temp_right = temp->getrchild() ;
+    node *temp_right_leftsubtree=temp_right->getlchild() ;
+
+    temp_right->setlchild(temp) ;                                //Actual_rotation
+    temp->setrchild(temp_right_leftsubtree) ;
+
+    temp->setheight( max(height(temp->getlchild()),height(temp->getrchild())) + 1 ) ;            //updation of height 
+    temp_right->setheight( max(height(temp_right->getlchild()),height(temp_right->getrchild())) + 1 ); 
+
+    return temp_right ;
+}
+
+
+int AVL::bal_fact(node *temp)
+{
+    if(temp==NULL) return 0 ;
+    else
+    {    
+        int left = 0, right =0;
+       if(temp->getlchild()) left = height(temp->getlchild()) +1 ;
+       if(temp->getrchild()) right = height(temp->getrchild()) +1 ;
+        return (left - right) ;
+    }
+}
+
+
 void AVL::order(int check)
 {	
 	node *temp=root ;
@@ -150,7 +238,7 @@ void AVL::preorder(node *temp)
 {
 	if(temp!=NULL)
 	{
-		cout<<temp->getdata()<<" ";
+		cout<<temp->getdata()<<" " ;
 		preorder(temp->getlchild()) ;
 		preorder(temp->getrchild());
 	}
@@ -182,7 +270,7 @@ int main()
 		    		cin>>data ;
 			    	a1.addnode(data);
 				    break;
-	    case 2 :	cout<<"Enter node value fro search : ";
+	    case 2 :	cout<<"Enter node value for search : ";
 		    		cin>>data ;
 			    /*/	if(a1.search(data)) 
 				    {
@@ -196,9 +284,9 @@ int main()
 	    case 3 :	cout<<"\n Delete Data ? : ";
 		    		cin>>data ;
 			    	a1.delnode(data);
-				    break;
+				    break;*/
 	    case 4 :	cout<<"Height is : "<<a1.height();
-		    		break;*/
+		    		break;
 	    case 5 : 	cout<<"InOrder is : ";
 	    			a1.order(1) ;
 		    		break;
