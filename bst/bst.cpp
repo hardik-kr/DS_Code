@@ -8,7 +8,6 @@ class node
 	int data ;
 	node *lchild ;
 	node *rchild ;
-	node *parent ;
 	public :
 	
 	node()
@@ -16,8 +15,6 @@ class node
 		data=0 ;
 		lchild=NULL ;
 		rchild=NULL ;
-		parent=NULL ;
-
 	}
 	void setdata(int val)
 	{
@@ -35,10 +32,6 @@ class node
 	{
 		return rchild ;
 	}
-	node *getparent()
-	{
-		return parent ;
-	}
 	void setlchild(node *temp)
 	{
 		lchild=temp ;
@@ -47,11 +40,6 @@ class node
 	{
 		rchild=temp ;
 	}
-	void setparent(node *temp)
-	{
-		parent=temp ;
-	}
-	
 };
 class bst
 {
@@ -62,7 +50,7 @@ class bst
 		root=NULL ;
 	}
 	void addnode(int);
-	void addnode(node *,int);
+	node * addnode(node *,int);
 	bool search(int);
 	node *search(node *,int);
 	void delnode(int);
@@ -72,52 +60,36 @@ class bst
 	void inorder(node *);
 	void preorder(node *);
 	void postorder(node *);
-	void leafnode(node *,node *);
-	void onechild(node *,node *);
-	void bothchild(node *,node *);
+	node *delnode(node *,int);
 };
 void bst::addnode(int val)
 {
-	
-	if(root==NULL)
-	{	
-		node *n=new node();
-		n->setdata(val) ;
-		root = n ;
-	}
-	else
-	{
-		node *temp = root ;
-		addnode(temp,val) ;
-	}	
+	node *n=root ;
+	root = addnode(n,val) ;	
 }
-void bst::addnode(node *temp,int data)
+node *bst::addnode(node *temp,int data)
 {	
-	if(temp->getdata() < data)
+	if(temp==NULL)
 	{
-		if(temp->getrchild()!=NULL)
-		addnode(temp->getrchild(),data);
-		else
-		{
-			node *n=new node();
-			temp->setrchild(n) ;
-			n->setdata(data);
-			n->setparent(temp);
-		}
-		
+		node *n=new node();
+		n->setdata(data);
+		return n;
 	}
 	else
 	{
-		if(temp->getlchild()!=NULL)
-		addnode(temp->getlchild(),data);
+		if(temp->getdata() < data)
+        {
+            temp->setrchild(addnode(temp->getrchild(),data)) ;
+        }
+        else if(temp->getdata() > data)
+        {
+            temp->setlchild(addnode(temp->getlchild(),data));
+        }
 		else
 		{
-			node *n=new node();
-			temp->setlchild(n);
-			n->setdata(data);
-			n->setparent(temp);
+			cout<<"\nAlready Present ";
 		}
-	}
+	}	
 }
 void bst::order(int check)
 {	
@@ -222,128 +194,48 @@ void bst::delnode(int data)
 	}
 	else
 	{	
-		if(t2->getlchild()==NULL && t2->getrchild()==NULL)
-		leafnode(t2,t2->getparent());
-		else if(t2->getlchild()==NULL || t2->getrchild()==NULL)
-		onechild(t2,t2->getparent());
-		else
-		bothchild(t2,t2->getparent());		
+		root = delnode(root,data);
 	}
 }
-void bst::leafnode(node *del,node *par)
-{	
-	if(par==NULL)
-	{	root=NULL ;
-		del=NULL ;
-	}
-	else if(del->getdata()>par->getdata())
+node *bst::delnode(node *temp,int data)
+{
+	if(root==NULL)
+	return root ;
+	else if(data > temp->getdata())
 	{
-		par->setrchild(NULL) ;
-		delete del ;
-		del=NULL ;
+		temp->setrchild(delnode(temp->getrchild(),data));
+	}
+	else if(data < temp->getdata())
+	{
+		temp->setlchild(delnode(temp->getlchild(),data));
 	}
 	else
 	{
-		par->setlchild(NULL) ;
-		delete del ;
-		del=NULL ;
-	}
-}
-void bst::onechild(node *del,node *par)
-{	node *pred=root,*succ=root ;
-	if(par==NULL)
-	{
-		if(del->getlchild()==NULL)
-		{	
-			succ=succ->getrchild();
-			while(succ->getlchild()!=NULL)
-				succ=succ->getlchild();
-			(succ->getparent())->setlchild(NULL) ;
-			succ->setrchild(root->getrchild());
-			delete root ;
-			root = succ ;
-			root->setparent(NULL);
-		}
-		else  //RightChild NULL
+		if(temp->getlchild()==NULL)
 		{
-			pred=pred->getlchild() ;
-			while(pred->getrchild()!=NULL)
-			(pred->getparent())->setrchild(NULL);
-			pred->setlchild(root->getlchild());
-			delete root ;
-			root=pred ;
-			root->setparent(NULL);
+			node *ret=temp->getrchild();
+			free(temp);
+			return ret ;
 		}
-	}
-	else if(par->getdata()>del->getdata())
-	{
-		if(del->getlchild()==NULL)
+		else if(temp->getrchild()==NULL)
 		{
-			par->setlchild(del->getrchild());
-			delete del ;
-			del=NULL ;
+			node *ret=temp->getlchild();
+			free(temp);
+			return ret ;
 		}
-		else
+		else 
 		{
-			par->setlchild(del->getlchild());
-			delete del ;
-			del = NULL ;
+			node *insucc = temp ;
+			insucc=insucc->getrchild();
+			while(insucc->getlchild()!=NULL)
+			{
+				insucc=insucc->getlchild();
+			}
+			temp->setdata(insucc->getdata());
+			temp->setrchild(delnode(temp->getrchild(),temp->getdata()));
 		}
-	}
-	else
-	{
-		if(del->getlchild()==NULL)
-		{
-			par->setrchild(del->getrchild()) ;
-			delete del ;
-			del = NULL ;
-		}
-		else
-		{
-			par->setrchild(del->getlchild());
-			delete del ;
-			del = NULL ;
-		}
-		
 	}
 	
-}
-void bst::bothchild(node *del,node *par)
-{	
-	if(par==NULL)
-	{	node *succ=root ;
-		succ=succ->getrchild();
-		while(succ->getlchild()!=NULL)
-		{
-			succ=succ->getlchild() ;
-		}
-		root->setdata(succ->getdata());
-		(succ->getparent())->setlchild(NULL);
-		delete succ ;
-		succ=NULL ;
-	}
-	else 
-	{
-		node *nodesucc=del ;
-		nodesucc=nodesucc->getrchild();
-		while(nodesucc->getlchild()!=NULL)
-		{
-			nodesucc=nodesucc->getlchild() ;
-		}
-		del->setdata(nodesucc->getdata());
-		if(nodesucc->getdata() < (nodesucc->getparent())->getdata())
-		{
-			(nodesucc->getparent())->setlchild(NULL);
-			delete nodesucc ;
-			nodesucc=NULL ;
-		}
-		else
-		{
-			(del->getparent())->setrchild(nodesucc->getrchild()) ;
-			delete del ;
-			del=NULL ;
-		}
-	}
 }
 int main()
 {

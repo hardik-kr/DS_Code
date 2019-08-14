@@ -1,4 +1,5 @@
 #include<iostream>
+#include<algorithm>
 #define MAX 10
 
 using namespace std ;

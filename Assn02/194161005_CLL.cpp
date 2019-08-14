@@ -1,4 +1,5 @@
 #include<iostream>
+#include<algorithm>
 
 using namespace std ;
 
@@ -186,7 +187,7 @@ int main()
                     cin>>data ;
                     if(!c1.search(data))
                     {
-                        cout<<"-1" ;
+                        cout<<"\n-1" ;
                     }
                    
                     break ;
