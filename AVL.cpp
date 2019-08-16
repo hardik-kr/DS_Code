@@ -15,6 +15,7 @@ class node
 	{
 		data=0 ;
 		lchild=NULL ;
+		
 		rchild=NULL ;
 		parent=NULL ;
         height=0 ;
