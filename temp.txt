@@ -288,3 +288,97 @@ void preOrder(Node *root)
   
 // Driver Code 
 int main()  
+
+
+
+
+/////./////////////////////////////////////
+
+#include <bits/stdc++.h> 
+using namespace std; 
+  
+/* A Binary Tree node */
+struct TNode { 
+    int data; 
+    struct TNode* left; 
+    struct TNode* right; 
+}; 
+  
+struct TNode* newNode(int data); 
+  
+/* Function to construct AVL tree  
+   from a sorted array */
+struct TNode* sortedArrayToBST(int arr[], int start, int end) 
+{ 
+    /* Base Case */
+    if (start > end) 
+        return NULL; 
+  
+    /* Get the middle element  
+       and make it root */
+    int mid = (start + end) / 2; 
+    struct TNode* root = newNode(arr[mid]); 
+  
+    /* Recursively construct the  
+       left subtree and make it  
+       left child of root */
+    root->left = sortedArrayToBST(arr, start, mid - 1); 
+  
+    /* Recursively construct the  
+       right subtree and make it  
+       right child of root */
+    root->right = sortedArrayToBST(arr, mid + 1, end); 
+  
+    return root; 
+} 
+  
+/* Helper function that allocates 
+   a new node with the given data  
+   and NULL to the left and  
+   the right pointers. */
+struct TNode* newNode(int data) 
+{ 
+    struct TNode* node = (struct TNode*) 
+        malloc(sizeof(struct TNode)); 
+    node->data = data; 
+    node->left = NULL; 
+    node->right = NULL; 
+  
+    return node; 
+} 
+  
+// This function is used for testing purpose 
+void printLevelOrder(TNode *root)  
+{  
+    if (root == NULL)  return;  
+  
+    queue<TNode *> q;  
+    q.push(root);  
+    
+    while (q.empty() == false)  
+    {  
+        TNode *node = q.front();  
+        cout << node->data << " ";  
+        q.pop();  
+        if (node->left != NULL)  
+            q.push(node->left);  
+        if (node->right != NULL)  
+            q.push(node->right);  
+    }  
+}    
+  
+/* Driver program to  
+test above functions */
+int main() 
+{ 
+  
+    // Assuming the array is sorted 
+    int arr[] = { 1, 2, 3, 4, 5, 6, 7 }; 
+    int n = sizeof(arr) / sizeof(arr[0]); 
+  
+    /* Convert List to AVL tree */
+    struct TNode* root = sortedArrayToBST(arr, 0, n - 1); 
+    printLevelOrder(root); 
+  
+    return 0; 
+} 
